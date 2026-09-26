@@ -111,6 +111,16 @@ Every configured service receives the event:
 AnalyticsManager.shared.send(SignUpEvent.completed(method: "apple"))
 ```
 
+### 5. Send events with implicit member syntax
+
+Create a sender bound to your event type, then drop the type name at the call site:
+
+```swift
+let analytics = AnalyticsManager.shared.sender(for: SignUpEvent.self)
+
+analytics.send(.completed(method: "apple"))
+```
+
 ## API
 
 | Symbol | Description |
@@ -120,6 +130,7 @@ AnalyticsManager.shared.send(SignUpEvent.completed(method: "apple"))
 | `AnalyticsManager.shared` | The shared, main-actor isolated manager. |
 | `configure(services:)` | Replaces the registered services. |
 | `send(_:)` | Forwards an event to every registered service. |
+| `sender(for:)` | Returns an `AnalyticsSender` bound to one event type, enabling `send(.event)`. |
 
 ## License
 
