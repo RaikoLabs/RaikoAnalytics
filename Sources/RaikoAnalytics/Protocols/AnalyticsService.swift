@@ -22,4 +22,13 @@
 
 public protocol AnalyticsService: Sendable {
     func send(_ event: any AnalyticsEvent)
+    func sendScreen(_ event: any AnalyticsScreenEvent)
+    func sendException(_ event: any AnalyticsExceptionEvent)
+}
+
+// MARK: - Default Implementations:
+
+public extension AnalyticsService {
+    func sendScreen(_ event: any AnalyticsScreenEvent) { }
+    func sendException(_ event: any AnalyticsExceptionEvent) { }
 }

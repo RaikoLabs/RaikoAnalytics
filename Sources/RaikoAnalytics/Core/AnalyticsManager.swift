@@ -44,10 +44,18 @@ public extension AnalyticsManager {
     }
 }
 
-// MARK: - Send Event:
+// MARK: - Send:
 
 public extension AnalyticsManager {
     func send(_ event: any AnalyticsEvent) {
         self.services.forEach { $0.send(event) }
+    }
+    
+    func sendScreen(_ event: any AnalyticsScreenEvent) {
+        self.services.forEach { $0.sendScreen(event) }
+    }
+    
+    func sendException(_ event: any AnalyticsExceptionEvent) {
+        self.services.forEach { $0.sendException(event) }
     }
 }

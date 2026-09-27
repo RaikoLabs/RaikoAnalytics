@@ -20,8 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public protocol AnalyticsEvent: Sendable {
+public protocol AnalyticsScreenEvent: Sendable {
     var name: String { get }
     var properties: [String: any Sendable]? { get }
-    var userProperties: [String: any Sendable]? { get }
 }

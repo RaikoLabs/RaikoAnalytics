@@ -20,8 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public protocol AnalyticsEvent: Sendable {
-    var name: String { get }
+public protocol AnalyticsExceptionEvent: Sendable {
+    var error: any Error { get }
     var properties: [String: any Sendable]? { get }
-    var userProperties: [String: any Sendable]? { get }
 }

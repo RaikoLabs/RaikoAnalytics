@@ -24,7 +24,7 @@ Or declare it in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/RaikoLabs/RaikoAnalytics.git", from: "1.0.0")
+    .package(url: "https://github.com/RaikoLabs/RaikoAnalytics.git", from: "1.1.0")
 ]
 ```
 
@@ -55,11 +55,27 @@ enum SignUpEvent: AnalyticsEvent {
         }
     }
 
-    var parameters: [String: String] {
+    var properties: [String: any Sendable]? {
         switch self {
-        case .completed(let method): ["method": method]
+        case .completed(let method): ["method": method, "is_first_launch": true]
         }
     }
+
+    var userProperties: [String: any Sendable]? { nil }
+}
+```
+
+Screens and errors have their own protocols:
+
+```swift
+struct HomeScreenEvent: AnalyticsScreenEvent {
+    let name = "home"
+    let properties: [String: any Sendable]? = nil
+}
+
+struct NetworkExceptionEvent: AnalyticsExceptionEvent {
+    let error: any Error
+    let properties: [String: any Sendable]? = nil
 }
 ```
 
@@ -72,10 +88,20 @@ import RaikoAnalytics
 
 struct ConsoleAnalyticsService: AnalyticsService {
     func send(_ event: any AnalyticsEvent) {
-        print("[Analytics] \(event.name) \(event.parameters)")
+        print("[Analytics] \(event.name) \(event.properties ?? [:])")
+    }
+
+    func sendScreen(_ event: any AnalyticsScreenEvent) {
+        print("[Analytics] screen \(event.name)")
+    }
+
+    func sendException(_ event: any AnalyticsExceptionEvent) {
+        print("[Analytics] exception \(event.error)")
     }
 }
 ```
+
+`sendScreen(_:)` and `sendException(_:)` have empty default implementations, so a service only implements the ones its provider supports.
 
 ### 3. Configure once
 
@@ -109,17 +135,23 @@ Every configured service receives the event:
 
 ```swift
 AnalyticsManager.shared.send(SignUpEvent.completed(method: "apple"))
+AnalyticsManager.shared.sendScreen(HomeScreenEvent())
+AnalyticsManager.shared.sendException(NetworkExceptionEvent(error: error))
 ```
 
 ## API
 
 | Symbol | Description |
 | --- | --- |
-| `AnalyticsEvent` | Describes an event with a `name` and string `parameters`. |
-| `AnalyticsService` | A provider that receives events via `send(_:)`. |
+| `AnalyticsEvent` | Describes an event with a `name` and optional `properties` and `userProperties`. |
+| `AnalyticsScreenEvent` | Describes a screen view with a `name` and optional `properties`. |
+| `AnalyticsExceptionEvent` | Describes an `error` with optional `properties`. |
+| `AnalyticsService` | A provider that receives events via `send(_:)`, `sendScreen(_:)` and `sendException(_:)`. |
 | `AnalyticsManager.shared` | The shared, main-actor isolated manager. |
 | `configure(services:)` | Replaces the registered services. |
 | `send(_:)` | Forwards an event to every registered service. |
+| `sendScreen(_:)` | Forwards a screen event to every registered service. |
+| `sendException(_:)` | Forwards an exception event to every registered service. |
 
 ## License
 
