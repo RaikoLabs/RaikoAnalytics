@@ -6,7 +6,7 @@ A lightweight Swift package that fans a single analytics event out to any number
 
 | Requirement | Version |
 | --- | --- |
-| Swift | 6.3 |
+| Swift | 6.0 |
 | iOS | 17.0 |
 | macOS | 14.0 |
 
@@ -24,7 +24,7 @@ Or declare it in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/RaikoLabs/RaikoAnalytics.git", from: "1.1.0")
+    .package(url: "https://github.com/RaikoLabs/RaikoAnalytics.git", from: "2.0.0")
 ]
 ```
 
@@ -55,13 +55,13 @@ enum SignUpEvent: AnalyticsEvent {
         }
     }
 
-    var properties: [String: any Sendable]? {
+    var properties: [String: AnalyticsValue]? {
         switch self {
-        case .completed(let method): ["method": method, "is_first_launch": true]
+        case .completed(let method): ["method": .string(method), "is_first_launch": true]
         }
     }
 
-    var userProperties: [String: any Sendable]? { nil }
+    var userProperties: [String: AnalyticsValue]? { nil }
 }
 ```
 
@@ -70,14 +70,16 @@ Screens and errors have their own protocols:
 ```swift
 struct HomeScreenEvent: AnalyticsScreenEvent {
     let name = "home"
-    let properties: [String: any Sendable]? = nil
+    let properties: [String: AnalyticsValue]? = nil
 }
 
 struct NetworkExceptionEvent: AnalyticsExceptionEvent {
     let error: any Error
-    let properties: [String: any Sendable]? = nil
+    let properties: [String: AnalyticsValue]? = nil
 }
 ```
+
+Property values are typed as `AnalyticsValue`, so a type analytics providers don't accept fails at compile time. Literals convert automatically; wrap variables in a case, such as `.string(method)`. A service reads the underlying value with `value`, for SDKs that take `[String: Any]`.
 
 ### 2. Implement a service
 
@@ -114,11 +116,9 @@ import SwiftUI
 @main
 struct MyApp: App {
     init() {
-        MainActor.assumeIsolated {
-            AnalyticsManager.shared.configure(services: [
-                ConsoleAnalyticsService()
-            ])
-        }
+        AnalyticsManager.shared.configure(services: [
+            ConsoleAnalyticsService()
+        ])
     }
 
     var body: some Scene {
@@ -146,6 +146,7 @@ AnalyticsManager.shared.sendException(NetworkExceptionEvent(error: error))
 | `AnalyticsEvent` | Describes an event with a `name` and optional `properties` and `userProperties`. |
 | `AnalyticsScreenEvent` | Describes a screen view with a `name` and optional `properties`. |
 | `AnalyticsExceptionEvent` | Describes an `error` with optional `properties`. |
+| `AnalyticsValue` | A property value: `.string`, `.int`, `.double` or `.bool`. |
 | `AnalyticsService` | A provider that receives events via `send(_:)`, `sendScreen(_:)` and `sendException(_:)`. |
 | `AnalyticsManager.shared` | The shared, main-actor isolated manager. |
 | `configure(services:)` | Replaces the registered services. |

@@ -22,5 +22,5 @@
 
 public protocol AnalyticsScreenEvent: Sendable {
     var name: String { get }
-    var properties: [String: any Sendable]? { get }
+    var properties: [String: AnalyticsValue]? { get }
 }

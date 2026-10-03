@@ -1,5 +1,3 @@
-// swift-tools-version: 6.0
-
 // The MIT License (MIT)
 //
 // Copyright (c) 2026 Raiko Labs, LLC
@@ -22,18 +20,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import PackageDescription
+public enum AnalyticsValue: Sendable, Hashable {
+    case string(String)
+    case int(Int)
+    case double(Double)
+    case bool(Bool)
+}
 
-let package = Package(
-    name: "RaikoAnalytics",
-    platforms: [
-        .iOS(.v17),
-        .macOS(.v14)
-    ],
-    products: [
-        .library(name: "RaikoAnalytics", targets: ["RaikoAnalytics"])
-    ],
-    targets: [
-        .target(name: "RaikoAnalytics")
-    ]
-)
+// MARK: - Value:
+
+public extension AnalyticsValue {
+    var value: any Sendable {
+        switch self {
+        case .string(let value): value
+        case .int(let value): value
+        case .double(let value): value
+        case .bool(let value): value
+        }
+    }
+}
+
+// MARK: - Literals:
+
+extension AnalyticsValue: ExpressibleByStringLiteral, ExpressibleByStringInterpolation {
+    public init(stringLiteral value: String) {
+        self = .string(value)
+    }
+}
+
+extension AnalyticsValue: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: Int) {
+        self = .int(value)
+    }
+}
+
+extension AnalyticsValue: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: Double) {
+        self = .double(value)
+    }
+}
+
+extension AnalyticsValue: ExpressibleByBooleanLiteral {
+    public init(booleanLiteral value: Bool) {
+        self = .bool(value)
+    }
+}

@@ -22,5 +22,5 @@
 
 public protocol AnalyticsExceptionEvent: Sendable {
     var error: any Error { get }
-    var properties: [String: any Sendable]? { get }
+    var properties: [String: AnalyticsValue]? { get }
 }
