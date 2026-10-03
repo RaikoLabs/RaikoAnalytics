@@ -22,6 +22,6 @@
 
 public protocol AnalyticsEvent: Sendable {
     var name: String { get }
-    var properties: [String: any Sendable]? { get }
-    var userProperties: [String: any Sendable]? { get }
+    var properties: [String: AnalyticsValue]? { get }
+    var userProperties: [String: AnalyticsValue]? { get }
 }
